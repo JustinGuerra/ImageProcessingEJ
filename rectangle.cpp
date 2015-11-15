@@ -33,7 +33,7 @@ int main(){
 	bool done = false;
 	
 	cout << "\n---Displaying original image--- \n";
-	Mat orimg = imread("keypad3.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
+	Mat orimg = imread("keypad5.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
 	checkimg(orimg); //check image
 	Mat img = orimg.clone(); //clone image
 	
@@ -66,16 +66,65 @@ int main(){
 	
 	// Mat roi1 = smallerImages.pop_back(1);
 	
-	Mat roi0 = img(Rect(248, 370, 59, 40));
-	Mat roi1 = img(Rect(167, 125, 59, 40)); //For researched keypad "keypad3.jpg"
-	Mat roi2 = img(Rect(248, 125, 59, 40)); 
-	Mat roi3 = img(Rect(332, 125, 59, 40));
-	Mat roi4 = img(Rect(167, 208, 59, 40)); 
-	Mat roi5 = img(Rect(248, 208, 59, 40));
-	Mat roi6 = img(Rect(332, 208, 59, 40));
-	Mat roi7 = img(Rect(167, 291, 59, 40));
-	Mat roi8 = img(Rect(248, 291, 59, 40));
-	Mat roi9 = img(Rect(332, 291, 59, 40));
+	double s1 = img.cols / 3.0;
+	double s2 = img.rows / 4.0;
+	
+	// cout << "\nSide 1: " << s1 << endl;
+	
+	Mat rois[10];
+	
+	Mat roi0 = img(Rect(s1, s2*3, s1, s2));
+	Mat roi1 = img(Rect(0, 0, s1, s2));
+	Mat roi2 = img(Rect(s1, 0, s1, s2));
+	Mat roi3 = img(Rect(s1*2, 0, s1, s2));
+	Mat roi4 = img(Rect(0, s2, s1, s2));
+	Mat roi5 = img(Rect(s1, s2, s1, s2));
+	Mat roi6 = img(Rect(s1*2, s2, s1, s2));
+	Mat roi7 = img(Rect(0, s2*2, s1, s2));
+	Mat roi8 = img(Rect(s1, s2*2, s1, s2));
+	Mat roi9 = img(Rect(s1*2, s2*2, s1, s2));
+	
+	rois[0] = roi0;
+	rois[1] = roi1;
+	rois[2] = roi2;
+	rois[3] = roi3;
+	rois[4] = roi4;
+	rois[5] = roi5;
+	rois[6] = roi6;
+	rois[7] = roi7;
+	rois[8] = roi8;
+	rois[9] = roi9;
+	
+	int blue1 = 0;
+	int green1 = 0;
+	
+	for(int i = 0; i < 11; i++){
+		
+		for(int y = 0; y < rois[i].rows; y++){
+			for(int x = 0; x < rois[i].cols; x++){
+				blue1 = rois[i].at<Vec3b>(y,x)[0]; //insert blue channel pixels intensity values
+				green1 = rois[i].at<Vec3b>(y,x)[1]; //insert green channel pixels intensity values
+				
+				if(blue1 > 0 && green1 > 0){ //threshold
+					rois[i].at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
+					rois[i].at<Vec3b>(y,x)[1] = 0;
+				}
+				
+			}  //traverse image change all black to blue
+		}
+		i++;
+	}
+	
+	// Mat roi0 = img(Rect(248, 370, 59, 40));
+	// Mat roi1 = img(Rect(167, 125, 59, 40)); //For researched keypad "keypad3.jpg"
+	// Mat roi2 = img(Rect(248, 125, 59, 40)); 
+	// Mat roi3 = img(Rect(332, 125, 59, 40));
+	// Mat roi4 = img(Rect(167, 208, 59, 40)); 
+	// Mat roi5 = img(Rect(248, 208, 59, 40));
+	// Mat roi6 = img(Rect(332, 208, 59, 40));
+	// Mat roi7 = img(Rect(167, 291, 59, 40));
+	// Mat roi8 = img(Rect(248, 291, 59, 40));
+	// Mat roi9 = img(Rect(332, 291, 59, 40));
 	
 	// Mat roi0 = img(Rect(235, 320, 120, 50));
 	// Mat roi1 = img(Rect(100, 150, 120, 50)); //For phone keypad "keypad4.jpg"
@@ -88,8 +137,8 @@ int main(){
 	// Mat roi8 = img(Rect(235, 255, 120, 50));
 	// Mat roi9 = img(Rect(385, 250, 120, 50));
 	
-	display(roi1); //display image
-	//modify this if you need to see a specific number or the whole image
+	display(roi8); //display image
+	//modify this if you nee	d to see a specific number or the whole image
 	
 	Scalar img0Mean = mean(roi0);
     Scalar img1Mean = mean(roi1);
@@ -101,17 +150,20 @@ int main(){
     Scalar img7Mean = mean(roi7);
     Scalar img8Mean = mean(roi8);
     Scalar img9Mean = mean(roi9);
+	Scalar imgfull = mean(img);
 	
-	cout << "\n image0: " << img0Mean << endl;
-    cout << " image1: " << img1Mean << endl;
-    cout << " image2: " << img2Mean << endl;
-    cout << " image3: " << img3Mean << endl;
-    cout << " image4: " << img4Mean << endl;
-    cout << " image5: " << img5Mean << endl;
-    cout << " image6: " << img6Mean << endl;
-    cout << " image7: " << img7Mean << endl;
-    cout << " image8: " << img8Mean << endl;
-    cout << " image9: " << img9Mean << endl;
+	cout << "\n Full Image: " << imgfull << endl;
+	
+	cout << "\n roi: " << img0Mean << endl;
+    cout << " roi1: " << img1Mean << endl;
+    cout << " roi2: " << img2Mean << endl;
+    cout << " roi3: " << img3Mean << endl;
+    cout << " roi4: " << img4Mean << endl;
+    cout << " roi5: " << img5Mean << endl;
+    cout << " roi6: " << img6Mean << endl;
+    cout << " roi7: " << img7Mean << endl;
+    cout << " roi8: " << img8Mean << endl;
+    cout << " roi9: " << img9Mean << endl;
     
 	double redZero = 0;
 	double redOne = 0;
@@ -202,7 +254,7 @@ int main(){
 	green = Scalar(img8Mean)[1];
 	blue = Scalar(img8Mean)[0];
 	
-	if(red > redLimit || blue < blueLimit){
+	if(red > redLimit){
 		cout << "\nEight has been pressed\n";
 		redEight = red;
 	}
@@ -224,6 +276,7 @@ int main(){
 	int code[4] = {0,0,0,0}; //create code array to store button press value
 	double Intens[4] = {0,0,0,0}; //create Intensity array to store Intensity value
 	int x = 0; //code index and intensity index number we want these to be equal
+	int j = 0; //code index and intensity index number we want these to be equal
 	double temp;
 	int count = 0; //prevent more than 4 numbers in code
 	
@@ -238,24 +291,26 @@ int main(){
 		}
 	}
 	
-	x = 0;
 	sort(Intens, Intens + 4); //sort intensity value from least to greatest
+	
 	for(int i = 0; i != 10; i++){
-		if(Intens[x] == Array[i]){
-			code[x] = i;
-			// cout << "\nX: " << x;
-			x++;
-			i = 0;
+		//where the intensity value matches the raw collected intesity values index
+		if(Intens[j] == Array[i]){ 
+			code[j] = i; //collect the index value
+			// cout << "\nX: " << j;
+			j++;
+			//reset i to traverse the raw collected intesity values from the beginning of the array
+			i = 0; 
 		}
 	}
 
 	cout << "\n\nThe most likely PINs are: \n";
 	do{	
 		for(int i = 0; i != 4; i++){
-			cout << code[i] << " ";
+			cout << code[i] << " "; //output pin number
 		}
 		cout << endl;
-	}while(next_permutation(code, code + 4));
+	}while(next_permutation(code, code + 4)); //output next permuation of code
 	
 	do{
 		cout << "\n\nReady to quit(q)?  ";
