@@ -33,7 +33,7 @@ int main(){
 	bool done = false;
 	
 	cout << "\n---Displaying original image--- \n";
-	Mat orimg = imread("keypad5.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
+	Mat orimg = imread("vend2.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
 	checkimg(orimg); //check image
 	Mat img = orimg.clone(); //clone image
 	
@@ -54,7 +54,7 @@ int main(){
 	// Mat roi8 = img(Rect(298, 225, 100, 85));
 	// Mat roi9 = img(Rect(398, 225, 100, 85));
 	
-	// Size smaller(59, 40);
+	// Size smaller(59, 40); 
 	// Mat smallerImages;
 	// Rect rect;
 	// for(int y = 0; y < rows; y += smaller.height){
@@ -66,23 +66,26 @@ int main(){
 	
 	// Mat roi1 = smallerImages.pop_back(1);
 	
-	double s1 = img.cols / 3.0;
-	double s2 = img.rows / 4.0;
-	
-	// cout << "\nSide 1: " << s1 << endl;
+	double numCols = img.cols / 3.0;
+	double numRows = img.rows / 4.0;
 	
 	Mat rois[10];
 	
-	Mat roi0 = img(Rect(s1, s2*3, s1, s2));
-	Mat roi1 = img(Rect(0, 0, s1, s2));
-	Mat roi2 = img(Rect(s1, 0, s1, s2));
-	Mat roi3 = img(Rect(s1*2, 0, s1, s2));
-	Mat roi4 = img(Rect(0, s2, s1, s2));
-	Mat roi5 = img(Rect(s1, s2, s1, s2));
-	Mat roi6 = img(Rect(s1*2, s2, s1, s2));
-	Mat roi7 = img(Rect(0, s2*2, s1, s2));
-	Mat roi8 = img(Rect(s1, s2*2, s1, s2));
-	Mat roi9 = img(Rect(s1*2, s2*2, s1, s2));
+	Mat roi0 = img(Rect(numCols, numRows*3, numCols, numRows));
+	Mat roi1 = img(Rect(0, 0, numCols, numRows));
+	Mat roi2 = img(Rect(numCols, 0, numCols, numRows));
+	Mat roi3 = img(Rect(numCols*2, 0, numCols, numRows));
+	Mat roi4 = img(Rect(0, numRows, numCols, numRows));
+	Mat roi5 = img(Rect(numCols, numRows, numCols, numRows));
+	Mat roi6 = img(Rect(numCols*2, numRows, numCols, numRows));
+	Mat roi7 = img(Rect(0, numRows*2, numCols, numRows));
+	Mat roi8 = img(Rect(numCols, numRows*2, numCols, numRows));
+	Mat roi9 = img(Rect(numCols*2, numRows*2, numCols, numRows));
+	// Mat star = img(Rect(0, numRows*3, numCols, numRows));
+	// Mat pound = img(Rect(numCols*2, numRows*3, numCols, numRows));
+	
+	// star =  Mat::ones(star.rows, star.cols, CV_8U);
+	// pound =  Mat::ones(pound.rows, pound.cols, CV_8U);
 	
 	rois[0] = roi0;
 	rois[1] = roi1;
@@ -95,24 +98,27 @@ int main(){
 	rois[8] = roi8;
 	rois[9] = roi9;
 	
+	int red1 = 0;
 	int blue1 = 0;
 	int green1 = 0;
 	
-	for(int i = 0; i < 11; i++){
-		
-		for(int y = 0; y < rois[i].rows; y++){
-			for(int x = 0; x < rois[i].cols; x++){
-				blue1 = rois[i].at<Vec3b>(y,x)[0]; //insert blue channel pixels intensity values
-				green1 = rois[i].at<Vec3b>(y,x)[1]; //insert green channel pixels intensity values
-				
-				if(blue1 > 0 && green1 > 0){ //threshold
-					rois[i].at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
-					rois[i].at<Vec3b>(y,x)[1] = 0;
-				}
-				
-			}  //traverse image change all black to blue
-		}
-		i++;
+	for(int y = 0; y < img.rows; y++){
+		for(int x = 0; x < img.cols; x++){
+			blue1 = img.at<Vec3b>(y,x)[0]; //insert blue channel pixels intensity values
+			green1 = img.at<Vec3b>(y,x)[1]; //insert green channel pixels intensity values
+			red1 = img.at<Vec3b>(y,x)[2];
+			
+			if(/* blue1 > 8 &&  */green1 > 10 && red1 > 200){ //threshold
+				img.at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
+				img.at<Vec3b>(y,x)[1] = 0;
+				img.at<Vec3b>(y,x)[2] = 255;
+			}else{
+				img.at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
+				img.at<Vec3b>(y,x)[1] = 0;
+				img.at<Vec3b>(y,x)[2] = 0;
+			}
+			
+		}  //traverse image change all black to blue
 	}
 	
 	// Mat roi0 = img(Rect(248, 370, 59, 40));
@@ -137,7 +143,7 @@ int main(){
 	// Mat roi8 = img(Rect(235, 255, 120, 50));
 	// Mat roi9 = img(Rect(385, 250, 120, 50));
 	
-	display(roi8); //display image
+	display(img); //display image
 	//modify this if you nee	d to see a specific number or the whole image
 	
 	Scalar img0Mean = mean(roi0);
@@ -175,8 +181,8 @@ int main(){
 	double redSeven = 0;
 	double redEight = 0;
 	double redNine = 0;
-	double redLimit = 130.000;
-	double blueLimit = 100.000;
+	double redLimit = Scalar(imgfull)[2];
+	double blueLimit = 0.000;
 	
 	double red = Scalar(img0Mean)[2];
 	double green = Scalar(img0Mean)[1];
@@ -273,15 +279,15 @@ int main(){
 	//intensity values that did not enter the threshold will be collected as 0.
 	double Array[10] = {redZero, redOne, redTwo, redThree, redFour, redFive, redSix, redSeven,
 						redEight, redNine}; //raw values collected from pictures
-	int code[4] = {0,0,0,0}; //create code array to store button press value
-	double Intens[4] = {0,0,0,0}; //create Intensity array to store Intensity value
+	int code[10] = {0,0,0,0,0,0,0,0,0,0}; //create code array to store button press value
+	double Intens[10] = {0,0,0,0,0,0,0,0,0,0}; //create Intensity array to store Intensity value
 	int x = 0; //code index and intensity index number we want these to be equal
 	int j = 0; //code index and intensity index number we want these to be equal
 	double temp;
 	int count = 0; //prevent more than 4 numbers in code
 	
 	cout << endl;
-	for(int i = 0; i != 10; i++){ //for loop to calculate code
+	for(int i = 0; i < 10; i++){ //for loop to calculate code
 		if(Array[i] > 0){ //If The intensity of red is greater than 0
 			code[x] = i; //store index number of value i into code array
 			Intens[x] = Array[i]; //store the intensity that was not zero into new array
@@ -291,17 +297,37 @@ int main(){
 		}
 	}
 	
-	sort(Intens, Intens + 4); //sort intensity value from least to greatest
+	cout << endl;
+	int numberIntens = 0;
+	for(int i = 0; i < 10; i++){
+		if(Intens[i] > 0){
+			numberIntens++;
+		}
+	}
 	
-	for(int i = 0; i != 10; i++){
+	sort(Intens, Intens + numberIntens); //sort intensity value from least to greatest
+	
+	for(int i = 0; i < 10; i++){
+		if(Intens[i] == 0){
+			Intens[0] = Intens[i - 4];
+			Intens[1] = Intens[i - 3];
+			Intens[2] = Intens[i - 2];
+			Intens[3] = Intens[i - 1];
+			//Intens[4,5,6,7,8,9] = 0;
+			i = 100;
+		}
+	}
+	
+	for(int i = 0; i < 10; i++){
 		//where the intensity value matches the raw collected intesity values index
-		if(Intens[j] == Array[i]){ 
+		if(Intens[j] == Array[i]/*  && x != 5 */){ 
 			code[j] = i; //collect the index value
 			// cout << "\nX: " << j;
 			j++;
 			//reset i to traverse the raw collected intesity values from the beginning of the array
-			i = 0; 
+			i = -1; 
 		}
+		
 	}
 
 	cout << "\n\nThe most likely PINs are: \n";
@@ -340,7 +366,7 @@ bool checkimg(Mat img){
 	if (img.empty()) //check whether the image is loaded or not
 	{
 		cout << "Error : Image cannot be loaded..!!" << endl;
-		return -1;
+		return 0;
 	}
 	return true;
 }
