@@ -73,10 +73,10 @@ void processPIN(Mat img){
 	rois[3] = img(Rect(numCols*2, 0, numCols, numRows)); //This creates 3 X 4  matrix of the entire image.
 	rois[4] = img(Rect(0, numRows, numCols, numRows)); //The same amount of pixels inside of each element
 	rois[5] = img(Rect(numCols, numRows, numCols, numRows)); //are used for the width and height of the rectangle.
-	rois[6] = img(Rect(numCols*2, numRows, numCols, numRows)); 	/*	[1][2][3]
-	rois[7] = img(Rect(0, numRows*2, numCols, numRows));			[4][5][6] 	
-	rois[8] = img(Rect(numCols, numRows*2, numCols, numRows));		[7][8][9]
-	rois[9] = img(Rect(numCols*2, numRows*2, numCols, numRows));	[*][0][#]	*/
+	rois[6] = img(Rect(numCols*2, numRows, numCols, numRows)); 	//	[1][2][3]
+	rois[7] = img(Rect(0, numRows*2, numCols, numRows));		//	[4][5][6] 	
+	rois[8] = img(Rect(numCols, numRows*2, numCols, numRows));	//	[7][8][9]
+	rois[9] = img(Rect(numCols*2, numRows*2, numCols, numRows));//	[*][0][#]	
 	rois[0] = img(Rect(numCols, numRows*3, numCols, numRows)); //zero is is in the center column and in the 4th row.
 	
 	Scalar roiMeans[10];
