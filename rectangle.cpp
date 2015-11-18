@@ -4,7 +4,11 @@
 * Date: 
 * Final Project
 *
-* Purpose: 
+* Purpose: The purpose of this project is to determine the pin number from an
+* thermal image of a very recently used access point.
+* 
+* ToDo:
+* Display keys in ASCII, comment and document
 *
 * Sources:  http://docs.opencv.org/
 ****************************************************************************/
@@ -22,324 +26,28 @@ using namespace std;
 
 bool checkimg(Mat img);
 void display(Mat img);
-void orig(Mat img);
+Mat inputImage();
+Mat createROIs(Mat img, Mat rois[]);
+void processImage(Mat img);
+void processPIN(Mat img);
 /****************************************************************************
 * Function: main
-* 
+* This function calls the inputImage function which returns a mat. That mat
+* is then processed by the processImage function. The post processed image is
+* then displayed. It then waits on user input to quit.
 ****************************************************************************/
 int main(){
 	system("clear");
 	char quit;
 	bool done = false;
-	
-	cout << "\n---Displaying original image--- \n";
-	Mat orimg = imread("vend2.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
-	checkimg(orimg); //check image
-	Mat img = orimg.clone(); //clone image
-	
-	double rows = img.rows; // image size
-	double cols = img.cols;
-	
-	cout<< "\nThe image has " << cols << " columns and " << rows << " rows - " 
-		<< img.size() << endl;
-					//Rect(x, y, w, h)
-	// Mat roi0 = img(Rect(298, 315, 100, 85));
-	// Mat roi1 = img(Rect(200, 45, 100, 85)); //For painted on keypad "keypad2.jpg"
-	// Mat roi2 = img(Rect(298, 45, 100, 85)); //For spray painted on only keypad "keypad.jpg"
-	// Mat roi3 = img(Rect(398, 45, 100, 85));
-	// Mat roi4 = img(Rect(200, 135, 100, 85)); 
-	// Mat roi5 = img(Rect(298, 135, 100, 85));
-	// Mat roi6 = img(Rect(398, 135, 100, 85));
-	// Mat roi7 = img(Rect(200, 225, 100, 85));
-	// Mat roi8 = img(Rect(298, 225, 100, 85));
-	// Mat roi9 = img(Rect(398, 225, 100, 85));
-	
-	// Size smaller(59, 40); 
-	// Mat smallerImages;
-	// Rect rect;
-	// for(int y = 0; y < rows; y += smaller.height){
-		// for (int j = 0; j < cols; j += smaller.width){
-			// rect = Rect(j, y, smaller.width, smaller.height);
-			// smallerImages.push_back(Mat(img, rect));
-		// }
-	// }
-	
-	// Mat roi1 = smallerImages.pop_back(1);
-	
-	double numCols = img.cols / 3.0;
-	double numRows = img.rows / 4.0;
-	
-	Mat rois[10];
-	
-	Mat roi0 = img(Rect(numCols, numRows*3, numCols, numRows));
-	Mat roi1 = img(Rect(0, 0, numCols, numRows));
-	Mat roi2 = img(Rect(numCols, 0, numCols, numRows));
-	Mat roi3 = img(Rect(numCols*2, 0, numCols, numRows));
-	Mat roi4 = img(Rect(0, numRows, numCols, numRows));
-	Mat roi5 = img(Rect(numCols, numRows, numCols, numRows));
-	Mat roi6 = img(Rect(numCols*2, numRows, numCols, numRows));
-	Mat roi7 = img(Rect(0, numRows*2, numCols, numRows));
-	Mat roi8 = img(Rect(numCols, numRows*2, numCols, numRows));
-	Mat roi9 = img(Rect(numCols*2, numRows*2, numCols, numRows));
-	// Mat star = img(Rect(0, numRows*3, numCols, numRows));
-	// Mat pound = img(Rect(numCols*2, numRows*3, numCols, numRows));
-	
-	// star =  Mat::ones(star.rows, star.cols, CV_8U);
-	// pound =  Mat::ones(pound.rows, pound.cols, CV_8U);
-	
-	rois[0] = roi0;
-	rois[1] = roi1;
-	rois[2] = roi2;
-	rois[3] = roi3;
-	rois[4] = roi4;
-	rois[5] = roi5;
-	rois[6] = roi6;
-	rois[7] = roi7;
-	rois[8] = roi8;
-	rois[9] = roi9;
-	
-	int red1 = 0;
-	int blue1 = 0;
-	int green1 = 0;
-	
-	for(int y = 0; y < img.rows; y++){
-		for(int x = 0; x < img.cols; x++){
-			blue1 = img.at<Vec3b>(y,x)[0]; //insert blue channel pixels intensity values
-			green1 = img.at<Vec3b>(y,x)[1]; //insert green channel pixels intensity values
-			red1 = img.at<Vec3b>(y,x)[2];
-			
-			if(/* blue1 > 8 &&  */green1 > 10 && red1 > 200){ //threshold
-				img.at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
-				img.at<Vec3b>(y,x)[1] = 0;
-				img.at<Vec3b>(y,x)[2] = 255;
-			}else{
-				img.at<Vec3b>(y,x)[0] = 0; //if blue is less than 20, increase to 255
-				img.at<Vec3b>(y,x)[1] = 0;
-				img.at<Vec3b>(y,x)[2] = 0;
-			}
-			
-		}  //traverse image change all black to blue
-	}
-	
-	// Mat roi0 = img(Rect(248, 370, 59, 40));
-	// Mat roi1 = img(Rect(167, 125, 59, 40)); //For researched keypad "keypad3.jpg"
-	// Mat roi2 = img(Rect(248, 125, 59, 40)); 
-	// Mat roi3 = img(Rect(332, 125, 59, 40));
-	// Mat roi4 = img(Rect(167, 208, 59, 40)); 
-	// Mat roi5 = img(Rect(248, 208, 59, 40));
-	// Mat roi6 = img(Rect(332, 208, 59, 40));
-	// Mat roi7 = img(Rect(167, 291, 59, 40));
-	// Mat roi8 = img(Rect(248, 291, 59, 40));
-	// Mat roi9 = img(Rect(332, 291, 59, 40));
-	
-	// Mat roi0 = img(Rect(235, 320, 120, 50));
-	// Mat roi1 = img(Rect(100, 150, 120, 50)); //For phone keypad "keypad4.jpg"
-	// Mat roi2 = img(Rect(240, 145, 120, 50));
-	// Mat roi3 = img(Rect(375, 140, 120, 50));
-	// Mat roi4 = img(Rect(100, 205, 120, 50));
-	// Mat roi5 = img(Rect(235, 200, 120, 50));
-	// Mat roi6 = img(Rect(385, 195, 120, 50));
-	// Mat roi7 = img(Rect(95, 260, 120, 50));
-	// Mat roi8 = img(Rect(235, 255, 120, 50));
-	// Mat roi9 = img(Rect(385, 250, 120, 50));
-	
+	Mat img = inputImage();
+
+	processPIN(img);
+	processImage(img); //make high intensities red and everything else black
 	display(img); //display image
-	//modify this if you nee	d to see a specific number or the whole image
-	
-	Scalar img0Mean = mean(roi0);
-    Scalar img1Mean = mean(roi1);
-    Scalar img2Mean = mean(roi2);
-    Scalar img3Mean = mean(roi3);
-    Scalar img4Mean = mean(roi4);
-    Scalar img5Mean = mean(roi5);
-    Scalar img6Mean = mean(roi6);
-    Scalar img7Mean = mean(roi7);
-    Scalar img8Mean = mean(roi8);
-    Scalar img9Mean = mean(roi9);
-	Scalar imgfull = mean(img);
-	
-	cout << "\n Full Image: " << imgfull << endl;
-	
-	cout << "\n roi: " << img0Mean << endl;
-    cout << " roi1: " << img1Mean << endl;
-    cout << " roi2: " << img2Mean << endl;
-    cout << " roi3: " << img3Mean << endl;
-    cout << " roi4: " << img4Mean << endl;
-    cout << " roi5: " << img5Mean << endl;
-    cout << " roi6: " << img6Mean << endl;
-    cout << " roi7: " << img7Mean << endl;
-    cout << " roi8: " << img8Mean << endl;
-    cout << " roi9: " << img9Mean << endl;
-    
-	double redZero = 0;
-	double redOne = 0;
-	double redTwo = 0;
-	double redThree = 0;
-	double redFour = 0;
-	double redFive = 0;
-	double redSix = 0;
-	double redSeven = 0;
-	double redEight = 0;
-	double redNine = 0;
-	double redLimit = Scalar(imgfull)[2];
-	double blueLimit = 0.000;
-	
-	double red = Scalar(img0Mean)[2];
-	double green = Scalar(img0Mean)[1];
-	double blue = Scalar(img0Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nZero has been pressed\n";
-		redZero = red;
-	}
-	
-	red = Scalar(img1Mean)[2]; //pull red Intensity value from Scalar
-	green = Scalar(img1Mean)[1]; //pull green Intensity value from Scalar
-	blue = Scalar(img1Mean)[0]; //pull blue Intensity value from Scalar
-	
-	if(red > redLimit || blue < blueLimit){ //Threshold for intensity mean
-		cout << "\nOne has been pressed\n";
-		redOne = red; //Store the Red intensity value
-	}
-	//This process is repeated for each rectangle image
-	red = Scalar(img2Mean)[2];
-	green = Scalar(img2Mean)[1];
-	blue = Scalar(img2Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){ //Threshold for intensity mean
-		cout << "\nTwo has been pressed\n";
-		redTwo = red; //Store the Red 
-	}
-	
-	red = Scalar(img3Mean)[2];
-	green = Scalar(img3Mean)[1];
-	blue = Scalar(img3Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nThree has been pressed\n";
-		redThree = red;
-	}
-
-	red = Scalar(img4Mean)[2];
-	green = Scalar(img4Mean)[1];
-	blue = Scalar(img4Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nFour has been pressed\n";
-		redFour = red;
-	}
-	
-	red = Scalar(img5Mean)[2];
-	green = Scalar(img5Mean)[1];
-	blue = Scalar(img5Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nFive has been pressed\n";
-		redFive = red;
-	}
-	
-	red = Scalar(img6Mean)[2];
-	green = Scalar(img6Mean)[1];
-	blue = Scalar(img6Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nSix has been pressed\n";
-		redSix = red;
-	}
-	
-	red = Scalar(img7Mean)[2];
-	green = Scalar(img7Mean)[1];
-	blue = Scalar(img7Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nSeven has been pressed\n";
-		redSeven = red;
-	}
-	
-	red = Scalar(img8Mean)[2];
-	green = Scalar(img8Mean)[1];
-	blue = Scalar(img8Mean)[0];
-	
-	if(red > redLimit){
-		cout << "\nEight has been pressed\n";
-		redEight = red;
-	}
-	
-	red = Scalar(img9Mean)[2];
-	green = Scalar(img9Mean)[1];
-	blue = Scalar(img9Mean)[0];
-	
-	if(red > redLimit || blue < blueLimit){
-		cout << "\nNine has been pressed\n";
-		redNine = red;
-	}
-	
-
-	//all of the variable within the threshold will be stored in this array, 
-	//intensity values that did not enter the threshold will be collected as 0.
-	double Array[10] = {redZero, redOne, redTwo, redThree, redFour, redFive, redSix, redSeven,
-						redEight, redNine}; //raw values collected from pictures
-	int code[10] = {0,0,0,0,0,0,0,0,0,0}; //create code array to store button press value
-	double Intens[10] = {0,0,0,0,0,0,0,0,0,0}; //create Intensity array to store Intensity value
-	int x = 0; //code index and intensity index number we want these to be equal
-	int j = 0; //code index and intensity index number we want these to be equal
-	double temp;
-	int count = 0; //prevent more than 4 numbers in code
-	
-	cout << endl;
-	for(int i = 0; i < 10; i++){ //for loop to calculate code
-		if(Array[i] > 0){ //If The intensity of red is greater than 0
-			code[x] = i; //store index number of value i into code array
-			Intens[x] = Array[i]; //store the intensity that was not zero into new array
-			cout << "\nIntens: " << Intens[x]; //output possible keys intensity values
-			cout << "\nCode: " << code[x]; //output possible code number
-			x++;
-		}
-	}
-	
-	cout << endl;
-	int numberIntens = 0;
-	for(int i = 0; i < 10; i++){
-		if(Intens[i] > 0){
-			numberIntens++;
-		}
-	}
-	
-	sort(Intens, Intens + numberIntens); //sort intensity value from least to greatest
-	
-	for(int i = 0; i < 10; i++){
-		if(Intens[i] == 0){
-			Intens[0] = Intens[i - 4];
-			Intens[1] = Intens[i - 3];
-			Intens[2] = Intens[i - 2];
-			Intens[3] = Intens[i - 1];
-			//Intens[4,5,6,7,8,9] = 0;
-			i = 100;
-		}
-	}
-	
-	for(int i = 0; i < 10; i++){
-		//where the intensity value matches the raw collected intesity values index
-		if(Intens[j] == Array[i]/*  && x != 5 */){ 
-			code[j] = i; //collect the index value
-			// cout << "\nX: " << j;
-			j++;
-			//reset i to traverse the raw collected intesity values from the beginning of the array
-			i = -1; 
-		}
-		
-	}
-
-	cout << "\n\nThe most likely PINs are: \n";
-	do{	
-		for(int i = 0; i != 4; i++){
-			cout << code[i] << " "; //output pin number
-		}
-		cout << endl;
-	}while(next_permutation(code, code + 4)); //output next permuation of code
 	
 	do{
-		cout << "\n\nReady to quit(q)?  ";
+		cout << "\nReady to quit(q)?  ";
 		cin  >> quit;
 		if(quit == 'q'){
 			done = true;
@@ -350,11 +58,148 @@ int main(){
 }
 
 /****************************************************************************
-* Function: orig
-* This function takes the original image and displays it.
+* Function: processPIN
+* This function creats 9 rois by 
 ****************************************************************************/
-void orig(Mat img){
-	display(img);
+void processPIN(Mat img){
+	Mat rois[10];
+
+	double numRows = img.rows / 4.0; //set number of roi rows	 (l/4)
+	double numCols = img.cols / 3.0; //set number of roi columns (w/3)
+							//Rect(x, y, w, h)	
+	
+	rois[1] = img(Rect(0, 0, numCols, numRows)); //start from the upper left most point (x, y) of the image.
+	rois[2] = img(Rect(numCols, 0, numCols, numRows)); //The image is traversed now by column/3 and row/4.
+	rois[3] = img(Rect(numCols*2, 0, numCols, numRows)); //This creates 3 X 4  matrix of the entire image.
+	rois[4] = img(Rect(0, numRows, numCols, numRows)); //The same amount of pixels inside of each element
+	rois[5] = img(Rect(numCols, numRows, numCols, numRows)); //are used for the width and height of the rectangle.
+	rois[6] = img(Rect(numCols*2, numRows, numCols, numRows)); 	/*	[1][2][3]
+	rois[7] = img(Rect(0, numRows*2, numCols, numRows));			[4][5][6] 	
+	rois[8] = img(Rect(numCols, numRows*2, numCols, numRows));		[7][8][9]
+	rois[9] = img(Rect(numCols*2, numRows*2, numCols, numRows));	[*][0][#]	*/
+	rois[0] = img(Rect(numCols, numRows*3, numCols, numRows)); //zero is is in the center column and in the 4th row.
+	
+	Scalar roiMeans[10];
+	for(int i = 0; i < 10; i++){
+		roiMeans[i] = mean(rois[i]); //calculate the mean values of rois
+	}
+	
+	Scalar imgfull = mean(img); //create full image scalar
+	double redLimit = Scalar(imgfull)[2]; //set threshold to full image mean intensity
+	double redIntens = 0;
+	
+	//all of the variable within the threshold will be stored in this array, 
+	//intensity values that did not enter the threshold will be collected as 0.
+	double Array[10]; //raw intensity values collected from pictures
+	double Intens[10]; //create Intensity array to store Intensity value
+	
+	for(int i = 0; i < 10; i++){
+		redIntens = Scalar(roiMeans[i])[2]; //variable for the red intesity value in each roi
+		
+		if(redIntens > redLimit){ //threshold for roi red intensity mean value
+			cout << "\n   " << i << " key pressed, mean intensity: " << redIntens << endl;
+			Array[i] = redIntens; //store intensity value if it is above threshold
+		}else{
+			Array[i] = 0; //replace values below the threshold with 0
+		}
+		Intens[i] = Array[i]; //create copy of raw data to be sorted
+	}
+	
+	//sort intensity value from greatest to least and only keep non zero values
+	for(int i = 0; i < 10; i++){
+		for (int x = 0; x < 10; x++){
+			if(Intens[x] < Intens[x + 1]){
+				double temp = Intens[x];
+				Intens[x] = Intens[x + 1];
+				Intens[x + 1] = temp;
+			}
+		}
+	}
+	//sort intensity value from greatest to least and only keep non zero values
+	
+	int j = 0;
+	int code[4]; //create code array to store button press value
+	for(int i = 0; i < 10; i++){
+		//where the intensity value matches the raw collected intesity values index
+		if(Intens[j] == Array[i] && j < 4){ 
+			code[j] = i; //collect the index value
+			j++; //next potential pin number
+			//reset i to traverse the filtered intesity values from the beginning of the array
+			i = -1; //to start over from zero
+		}
+	}
+
+	cout << "\n The most likely PINs are: \n\n";
+	do{	
+		cout << "   ";
+		for(int i = 3; i != -1; i--){
+			cout << code[i] << " "; //output pin number
+		}
+		cout << endl;
+	}while(prev_permutation(code, code + 4)); //output previous permuation of code
+
+/*/////////////////////////////////////////////////////////////////////////////////////////////////	
+	int y;
+	for(int i = 0; i < 10; i++){
+		if(code[y] == i){
+			cout << "[" << i << "][" << i + 1 << "][3]\n";
+			cout << "[4][5][6]\n";
+			cout << "[7][8][9]\n";
+			cout << "[*][0][#]\n";
+			y++;
+			i = 0;
+		}
+	}
+///////////////////////////////////////////////////////////////////////////////////////////////////*/
+
+}
+
+/****************************************************************************
+* Function: processImage
+* 
+****************************************************************************/
+void processImage(Mat img){
+	int red = 0, blue = 0, green = 0;
+	
+	for(int y = 0; y < img.rows; y++){
+		for(int x = 0; x < img.cols; x++){
+			blue = img.at<Vec3b>(y,x)[0];  //insert blue channel pixels intensity values
+			green = img.at<Vec3b>(y,x)[1]; //insert green channel pixels intensity values
+			red = img.at<Vec3b>(y,x)[2];	//insert red channel pixels intensity values
+			
+			//Modify these values for imge correction
+			//blue ~[5-20]) //green ~[5-20] //red ~[150-250]
+			if(blue > 5 && green > 5 && red > 150){ //threshold for isolating presses
+				img.at<Vec3b>(y,x)[0] = 0; 		//set all blue intensities to black
+				img.at<Vec3b>(y,x)[1] = 0;  	//set all green intensities to black
+				img.at<Vec3b>(y,x)[2] = 255;  	//max out all red intensities
+			}else{
+				img.at<Vec3b>(y,x)[0] = 0;  	//set all blue intensities to black
+				img.at<Vec3b>(y,x)[1] = 0;  	//set all green intensities to black
+				img.at<Vec3b>(y,x)[2] = 0;  	//set all red intensities to black
+			}
+			
+		}  //traverse image pixel by pixel
+	}
+}
+
+/****************************************************************************
+* Function:inputImage
+* 
+****************************************************************************/
+Mat inputImage(){
+	cout << "\n ---Displaying Original Image--- \n";
+	Mat orimg = imread("vend11.jpg", CV_LOAD_IMAGE_UNCHANGED); //imread in image
+	checkimg(orimg); //check image
+	Mat img = orimg.clone(); //clone image
+	
+	double rows = img.rows; // image size
+	double cols = img.cols;
+	
+	cout<< "\n The image has " << cols << " columns and " << rows << " rows - " 
+		<< img.size() << endl; //output file dimensions
+		
+	return img;
 }
 
 /****************************************************************************
