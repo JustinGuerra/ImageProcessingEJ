@@ -1,0 +1,1 @@
+The code written by Justin is at the end of the rectangle.cpp file. It reads the keypad5.jpg file. This was our original test image and was the last image we tried the code on before we scrapped the idea. 
